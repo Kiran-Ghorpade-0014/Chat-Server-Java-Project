@@ -19,28 +19,7 @@ public class ServerListenThread extends Thread{
     public void run() {
 
         try {
-            // Client Input
-            BufferedReader client_input = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
-            // Client Output : send response to client
-            PrintWriter client_output = new PrintWriter(client_socket.getOutputStream(), true);
 
-            while (true) {
-                String client_message;
-
-                if (client_socket.isClosed()) {
-                    System.out.println("Notice : '" + client_address + "' disconnected...");
-
-                    client_socket.close();
-                    return;
-                }
-
-                while ((client_message = client_input.readLine()) != null) {
-                    // send message to all clients message
-                    client_output.println(client_address + " :\n|->| " + client_message);
-                    // log client activity to console
-                    System.out.println(client_address + " :|->| " + client_message);
-                }
-            }
         } catch (Exception e) {
             System.out.println("Notice : '" + client_address + "' disconnected...");
             return;

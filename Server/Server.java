@@ -1,23 +1,30 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Server
  */
 public class Server {
 
+    static ServerSocket server_socket = null;
+    static Socket client_socket = null;
+    static Set<SocketThread> usersSockets = new HashSet<>();
+
+    static void broadcast(String message, SocketThread exclude_client) throws IOException{
+        for(SocketThread client : usersSockets) {
+            if (client != exclude_client) {
+                client.sendMessage(message);
+            }
+        }
+    }
+
     public static void main(String[] args){
-
-            ServerSocket server_socket = null;
-            Socket client_socket = null;
-
             try {
             server_socket = new ServerSocket(888);
             System.out.println("Notice : Server Started at port : "+ server_socket.getLocalPort());
-            // System.out.println("----````````````````````````````````````----");
-            // System.out.println("---- Enter Shift+` to Broadcast Message ----");
-            // System.out.println("----,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,----");
 
             while (true) {
 
@@ -28,11 +35,18 @@ public class Server {
                 }
                 
                 System.out.println("Notice : New User Connected : "+ client_socket.getRemoteSocketAddress());
-                new SocketThread(client_socket).start();
+                SocketThread new_client = new SocketThread(client_socket);
+                usersSockets.add(new_client);
+                new_client.start();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void removeClient(String client_address, SocketThread socketThread) {
+        usersSockets.remove(socketThread);
+        System.out.println("Notice : Disconnected from " + client_address);
     }
 }
